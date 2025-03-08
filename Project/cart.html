@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - Tech2etc Ecommerce</title>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" />
+    <link rel="stylesheet" href="stylee.css">
+</head>
+
+<body>
+
+    <section id="header">
+        <a href="#"><img src="img/logo.png" class="logo" width="10" alt="Tech2etc Logo"></a>
+
+        <div>
+            <ul id="navbar">
+                <li><a href="index.html">HOME</a></li>
+                <li><a href="shop.html">SHOP</a></li>
+                <li><a href="about.html">ABOUT</a></li>
+                <li><a href="contact.html">CONTACT</a></li>
+                <li><a class="active" href="cart.html"><i class="far fa-shopping-bag"></i></a></li>
+                <li>Cart: <span id="cart-count">0</span></li>
+                
+            </ul>
+        </div>
+    </section>
+
+    <section id="cart" class="section-p1">
+        <h2>Your Cart</h2>
+        <div id="cart-items-container">
+            <!-- Cart items will be injected here by JavaScript -->
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function displayCartItems() {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const cartItemsContainer = document.getElementById('cart-items-container');
+                cartItemsContainer.innerHTML = '';
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+                } else {
+                    cart.forEach(item => {
+                        const cartItem = document.createElement('div');
+                        cartItem.classList.add('cart-item');
+                        cartItem.innerHTML = `
+                            <h5>${item.name}</h5>
+                            <p>Price: ${item.price}</p>
+                            <p>Quantity: ${item.quantity}</p>
+                            <button class="remove-item" data-id="${item.id}">Remove</button>
+                        `;
+                        cartItemsContainer.appendChild(cartItem);
+                    });
+
+                    const removeButtons = document.querySelectorAll('.remove-item');
+                    removeButtons.forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            const productId = event.target.getAttribute('data-id');
+                            removeFromCart(productId);
+                        });
+                    });
+                }
+            }
+
+            function removeFromCart(productId) {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                cart = cart.filter(item => item.id !== productId);
+                localStorage.setItem('cart', JSON.stringify(cart));
+                displayCartItems();
+                updateCartCount();
+            }
+
+            function updateCartCount() {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const cartCount = cart.reduce((acc, product) => acc + product.quantity, 0);
+                document.getElementById('cart-count').innerText = cartCount;
+            }
+
+            // Initialize cart items on page load
+            displayCartItems();
+            updateCartCount();
+        });
+    </script>
+</body>
+
+</html>
